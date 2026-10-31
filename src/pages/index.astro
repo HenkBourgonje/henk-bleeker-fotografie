@@ -6,6 +6,15 @@ import { EMAIL } from '../contact.js';
 
 const hero = photos.find((p) => p.file === '000010');
 
+// src/collections/<slug>.md, a photo joins one with "collection": "<slug>"; a collection without text shows nothing
+const collections = import.meta.glob('../collections/*.md', { eager: true });
+const story = (p) => {
+  if (!p.collection) return;
+  const c = collections[`../collections/${p.collection}.md`];
+  if (!c) throw new Error(`${p.file}: no src/collections/${p.collection}.md`);
+  return c.rawContent().trim() && c;
+};
+
 const mailto = (p) =>
   `mailto:${EMAIL}?subject=${encodeURIComponent(`Enquiry: ${p.title}`)}&body=${encodeURIComponent(
     `Hello Henk,\n\nI'm interested in the photo "${p.title}" (ref. ${p.file}).\n\n`,
@@ -28,20 +37,31 @@ const ogImage = new URL(`${import.meta.env.BASE_URL}photos/${hero.file}-1280.jpg
     ))}
   </main>
 
-  {photos.map((p) => (
-    <dialog id={`p-${p.file}`}>
-      <form method="dialog"><button class="close" aria-label="Close">
-        <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19" /></svg>
-      </button></form>
-      <figure>
-        <Photo photo={p} sizes={`min(92vw, ${Math.round((78 * p.width) / p.height)}vh)`} />
-        <figcaption>
-          <span>{p.title}</span>
-          <a class="enquire" href={mailto(p)}>Enquire</a>
-        </figcaption>
-      </figure>
-    </dialog>
-  ))}
+  {photos.map((p) => {
+    const c = story(p);
+    return (
+      <dialog id={`p-${p.file}`}>
+        <form method="dialog"><button class="close" aria-label="Close">
+          <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19" /></svg>
+        </button></form>
+        <figure>
+          <Photo photo={p} sizes={`min(92vw, ${Math.round((78 * p.width) / p.height)}vh)`} />
+          <figcaption>
+            <span>{p.title}</span>
+            {c && <a class="series" href={`#s-${p.file}`}>{c.frontmatter.title}</a>}
+            {p.text && <p class="text" lang="nl">{p.text}</p>}
+            <a class="enquire" href={mailto(p)}>Enquire</a>
+          </figcaption>
+        </figure>
+        {c && (
+          <section class="text" id={`s-${p.file}`} lang="nl">
+            <h2>{c.frontmatter.title}</h2>
+            <c.Content />
+          </section>
+        )}
+      </dialog>
+    );
+  })}
 
   <script is:inline>
     for (const b of document.querySelectorAll('[data-open]'))
@@ -82,8 +102,11 @@ const ogImage = new URL(`${import.meta.env.BASE_URL}photos/${hero.file}-1280.jpg
     padding: 0;
     border: 0;
     background: #fff;
+    box-sizing: border-box;
+    padding-block: 5vh;
   }
-  dialog[open] { display: grid; place-items: center; }
+  /* photo centred; with a story below it, the dialog scrolls from the top */
+  dialog[open] { display: grid; justify-items: center; align-content: safe center; }
   body:has(dialog[open]) { overflow: hidden; }
   .close { position: fixed; top: 16px; right: 16px; padding: 8px; border: 0; background: none; color: #222; cursor: pointer; }
   figure { margin: 0; }
@@ -100,4 +123,12 @@ const ogImage = new URL(`${import.meta.env.BASE_URL}photos/${hero.file}-1280.jpg
   }
   .enquire { padding: 10px 32px; border: 1px solid; font-size: 11px; letter-spacing: 0.2em; text-decoration: none; }
   .enquire:hover { background: #222; color: #fff; }
+  .series { margin-top: -8px; font-size: 11px; color: var(--gray); text-decoration: none; }
+  .series:hover { color: #222; }
+
+  .text { max-width: 580px; margin: 0; padding: 0 var(--pad); font-size: 15px; letter-spacing: normal; text-transform: none; }
+  section.text { margin-top: 64px; }
+  .text h2, .text h3 { font-weight: 300; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .text h2 { margin: 0 0 24px; text-align: center; }
+  .text h3 { margin: 32px 0 0; }
 </style>
