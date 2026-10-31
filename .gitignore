@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+
+# Full-size originals and the old-site scrape stay local; the site only ships public/photos
+DW website/
+henkbleeker-photos/
+*.tif
+*.tiff
