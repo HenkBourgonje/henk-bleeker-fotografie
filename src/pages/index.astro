@@ -1,0 +1,103 @@
+---
+import Layout from '../Layout.astro';
+import Photo from '../Photo.astro';
+import photos from '../photos.json';
+import { EMAIL } from '../contact.js';
+
+const hero = photos.find((p) => p.file === '000010');
+
+const mailto = (p) =>
+  `mailto:${EMAIL}?subject=${encodeURIComponent(`Enquiry: ${p.title}`)}&body=${encodeURIComponent(
+    `Hello Henk,\n\nI'm interested in the photo "${p.title}" (ref. ${p.file}).\n\n`,
+  )}`;
+const ogImage = new URL(`${import.meta.env.BASE_URL}photos/${hero.file}-1280.jpg`, Astro.site);
+---
+<Layout image={ogImage} overlay>
+  <section class="hero">
+    <Photo photo={hero} sizes={`max(100vw, ${Math.round((100 * hero.width) / hero.height)}vh)`} loading="eager" fetchpriority="high" />
+    <a class="down" href="#work" aria-label="Scroll to work">
+      <svg viewBox="0 0 24 24"><path d="m5 9 7 7 7-7" /></svg>
+    </a>
+  </section>
+
+  <main id="work">
+    {photos.map((p) => (
+      <button class="thumb" data-open={`p-${p.file}`}>
+        <Photo photo={p} sizes="(min-width: 900px) 33vw, (min-width: 600px) 50vw, 100vw" />
+      </button>
+    ))}
+  </main>
+
+  {photos.map((p) => (
+    <dialog id={`p-${p.file}`}>
+      <form method="dialog"><button class="close" aria-label="Close">
+        <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19" /></svg>
+      </button></form>
+      <figure>
+        <Photo photo={p} sizes={`min(92vw, ${Math.round((78 * p.width) / p.height)}vh)`} />
+        <figcaption>
+          <span>{p.title}</span>
+          <a class="enquire" href={mailto(p)}>Enquire</a>
+        </figcaption>
+      </figure>
+    </dialog>
+  ))}
+
+  <script is:inline>
+    for (const b of document.querySelectorAll('[data-open]'))
+      b.addEventListener('click', () => document.getElementById(b.dataset.open).showModal());
+    // click on the white space around the photo closes it
+    for (const d of document.querySelectorAll('dialog'))
+      d.addEventListener('click', (e) => e.target === d && d.close());
+  </script>
+</Layout>
+
+<style is:global>
+  .hero { position: relative; height: 100svh; color: #fff; }
+  .hero img { height: 100%; object-fit: cover; }
+  .down { position: absolute; bottom: 20px; left: 50%; translate: -50%; filter: drop-shadow(0 0 4px rgb(0 0 0 / 0.6)); }
+  .down svg, .close svg { display: block; width: 32px; height: 32px; stroke-width: 1.5; }
+  .close svg { width: 22px; height: 22px; }
+
+  main { columns: 3 260px; column-gap: 24px; padding: var(--pad); }
+  .thumb {
+    display: block;
+    width: 100%;
+    margin: 0 0 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+    break-inside: avoid;
+  }
+  .thumb img { transition: opacity 0.3s; }
+  .thumb:hover img { opacity: 0.85; }
+
+  dialog {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #fff;
+  }
+  dialog[open] { display: grid; place-items: center; }
+  body:has(dialog[open]) { overflow: hidden; }
+  .close { position: fixed; top: 16px; right: 16px; padding: 8px; border: 0; background: none; color: #222; cursor: pointer; }
+  figure { margin: 0; }
+  figure img { width: auto; max-width: 92vw; max-height: 78vh; }
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-top: 20px;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .enquire { padding: 10px 32px; border: 1px solid; font-size: 11px; letter-spacing: 0.2em; text-decoration: none; }
+  .enquire:hover { background: #222; color: #fff; }
+</style>

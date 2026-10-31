@@ -1,0 +1,20 @@
+---
+// public/photos holds <file>-<width>.{avif,jpg} from resize-heroes.sh, which skips widths >= the original
+const { photo, sizes, loading = 'lazy', ...rest } = Astro.props;
+const widths = [640, 1280, 1920, 2560, 3840].filter((w) => w < photo.width);
+const url = (w, ext) => `${import.meta.env.BASE_URL}photos/${photo.file}-${w}.${ext}`;
+const srcset = (ext) => widths.map((w) => `${url(w, ext)} ${w}w`).join(', ');
+---
+<picture>
+  <source type="image/avif" srcset={srcset('avif')} sizes={sizes} />
+  <img
+    src={url(widths[0], 'jpg')}
+    srcset={srcset('jpg')}
+    sizes={sizes}
+    width={photo.width}
+    height={photo.height}
+    alt={photo.title}
+    loading={loading}
+    {...rest}
+  />
+</picture>
