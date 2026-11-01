@@ -1,0 +1,44 @@
+---
+import Layout from '../../Layout.astro';
+import Photo from '../../Photo.astro';
+
+// one page per src/text/<page>/<lang>.md, with title and photo in the frontmatter
+export const getStaticPaths = () =>
+  Object.entries(import.meta.glob('../../text/*/*.md', { eager: true })).map(([path, text]) => {
+    const [, page, lang] = path.match(/([^/]+)\/(nl|en)\.md$/);
+    return { params: { page, lang: lang === 'nl' ? undefined : lang }, props: { text } };
+  });
+const { text } = Astro.props;
+const lang = Astro.params.lang ?? 'nl';
+const { title, photo } = text.frontmatter;
+---
+<Layout lang={lang} title={`${title} · Henk Bleeker Photography`}>
+  <main class="page">
+    <aside>
+      <Photo photo={photo} sizes="(min-width: 640px) 300px, 100vw" />
+    </aside>
+    <article>
+      <h1>{title}</h1>
+      <text.Content />
+    </article>
+  </main>
+</Layout>
+
+<style is:global>
+  /* like Dean West: text column centred on the page, the photo hanging to its left */
+  .page {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(0, 580px) 1fr;
+    gap: 32px;
+    padding: 16px var(--pad) 48px;
+  }
+  .page aside { justify-self: end; width: min(100%, 300px); margin-top: 46px; }
+  .page h1 { margin: 0 0 20px; font-size: 15px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; }
+  .page h2 { margin: 2.4em 0 1.4em; font-size: 13px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; }
+  .page p { margin: 0 0 1.4em; font-size: 14px; line-height: 1.75; }
+
+  @media (max-width: 640px) {
+    .page { grid-template-columns: 1fr; }
+    .page aside { width: 100%; margin-top: 0; }
+  }
+</style>

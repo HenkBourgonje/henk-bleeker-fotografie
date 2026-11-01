@@ -1,6 +1,6 @@
 # Henk Bleeker Photography
 
-Static Astro site: home (hero, gallery, lightbox with a mailto "Enquire" button) and about (bio from his old Squarespace site in `src/about/<lang>.md`). Shared header/footer in `src/Layout.astro`, email and Instagram in `src/contact.js`. Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`.
+Static Astro site: home (hero, gallery, lightbox with a mailto "Enquire" button) and text pages (about, wetlands-gallery). A text page is `src/text/<page>/<lang>.md` (`title` and `photo` in the frontmatter, text as the body), rendered by `src/pages/[...lang]/[page].astro`; its header link sits in `src/Layout.astro`. Shared header/footer in `src/Layout.astro`, email and Instagram in `src/contact.js`. Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`.
 
 Bilingual: Dutch (default) at the root, English under `/en/`, both built from `src/pages/[...lang]/`. Interface strings sit in a `t` object at the top of each file. Every text exists in `nl` and `en`; translations keep the Dutch voice (first person, plain, unpolished). "Enquire" stays English in both.
 
