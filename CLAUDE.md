@@ -6,7 +6,7 @@ Bilingual: Dutch (default) at the root, English under `/en/`, both built from `s
 
 ## Adding a photo
 
-1. Put the original in `DW website/` (gitignored, never commit originals).
+1. Put the original in `DW website/` (gitignored, never commit originals), under a plain name (no spaces). The script reads jpg and tif only, so convert a PSD first: `sips -s format tiff x.psd --out x.tif`.
 2. Run `./resize-heroes.sh` — writes `public/photos/<name>-<width>.{jpg,avif}`, `<name>` being the lowercased filename. It skips damaged originals; ask for a fresh copy.
 3. Add `{ "file", "title", "width", "height" }` to `src/photos.json`, with the original's pixel size (`vipsheader -f width <file>` / `-f height`).
    The title goes into the enquiry email, so ask for the real title rather than inventing one.
