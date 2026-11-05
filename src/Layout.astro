@@ -3,7 +3,7 @@ import Logo from './logo.svg';
 import { EMAIL, INSTAGRAM } from './contact.js';
 
 // lang: 'nl' at the site root, 'en' under en/
-// overlay: white header on top of the home page hero, where the logo is the page's h1
+// overlay: header on top of the home page hero, where the logo is the page's h1
 const { lang, title = 'Henk Bleeker Photography', image, overlay = false } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const home = lang === 'en' ? `${base}en/` : base;
@@ -78,8 +78,17 @@ const Brand = overlay ? 'h1' : 'div';
     position: absolute;
     inset: 0 0 auto;
     z-index: 1;
-    color: #fff;
-    filter: drop-shadow(0 0 4px rgb(0 0 0 / 0.6));
+  }
+  /* white logo on the hero's dark left. What sits behind the icons changes with the screen's shape
+     (the photo is cropped to fill it), so they get a light backing of their own */
+  header.overlay .logo { color: #fff; filter: drop-shadow(0 0 4px rgb(0 0 0 / 0.6)); }
+  header.overlay nav {
+    margin: -8px 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 0.75);
+    backdrop-filter: blur(6px);
+    color: #222;
   }
   .logo { margin: 0; }
   .logo svg { display: block; width: 64px; height: auto; fill: currentColor; stroke: none; }
