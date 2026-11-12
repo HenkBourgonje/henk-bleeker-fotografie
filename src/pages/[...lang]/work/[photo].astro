@@ -1,0 +1,32 @@
+---
+import Layout from '../../../Layout.astro';
+import PhotoView from '../../../PhotoView.astro';
+import photos from '../../../photos.json';
+import { imageObject } from '../../../work.js';
+
+// every photo its own address, in both languages, so search engines and language models can find and link to it
+export const getStaticPaths = () =>
+  [undefined, 'en'].flatMap((lang) => photos.map((photo) => ({ params: { lang, photo: photo.file }, props: { photo } })));
+const { photo } = Astro.props;
+const lang = Astro.params.lang ?? 'nl';
+const collection = import.meta.glob('../../../collections/*/*.md', { eager: true })[`../../../collections/${lang}/${photo.collection}.md`];
+const t = {
+  nl: { description: (series) => `"${photo.title}", foto van Henk Bleeker${series ? ` uit de serie ${series}` : ''}.` },
+  en: { description: (series) => `"${photo.title}", a photograph by Henk Bleeker${series ? ` from the series ${series}` : ''}.` },
+}[lang];
+---
+<Layout
+  lang={lang}
+  title={`${photo.title} · Henk Bleeker Photography`}
+  description={t.description(collection?.frontmatter.title)}
+  {photo}
+  ld={[imageObject(photo, lang, Astro.site)]}
+>
+  <main class="work">
+    <PhotoView {photo} {lang} page />
+  </main>
+</Layout>
+
+<style>
+  .work { display: flex; flex-direction: column; align-items: center; padding-bottom: 5vh; }
+</style>

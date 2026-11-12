@@ -1,49 +1,23 @@
 ---
 import Layout from '../../Layout.astro';
 import Photo from '../../Photo.astro';
+import PhotoView from '../../PhotoView.astro';
 import photos from '../../photos.json';
 import Logo from '../../logo.svg';
-import { EMAIL } from '../../contact.js';
+import { workPath, imageObject } from '../../work.js';
 
 // Dutch at the root, English under en/
 export const getStaticPaths = () => [{ params: { lang: undefined } }, { params: { lang: 'en' } }];
 const lang = Astro.params.lang ?? 'nl';
 const t = {
-  nl: {
-    down: 'Scroll naar het werk', prev: 'Vorige', next: 'Volgende', close: 'Sluiten',
-    subject: 'Interesse', body: (p) => `Hallo Henk,\n\nIk heb interesse in de foto "${p.title}" (ref. ${p.file}).\n\n`,
-  },
-  en: {
-    down: 'Scroll to work', prev: 'Previous', next: 'Next', close: 'Close',
-    subject: 'Enquiry', body: (p) => `Hello Henk,\n\nI'm interested in the photo "${p.title}" (ref. ${p.file}).\n\n`,
-  },
+  nl: { down: 'Scroll naar het werk', prev: 'Vorige', next: 'Volgende', close: 'Sluiten' },
+  en: { down: 'Scroll to work', prev: 'Previous', next: 'Next', close: 'Close' },
 }[lang];
 
 const hero = photos.find((p) => p.file === '000010');
 
-// src/collections/<lang>/<slug>.md, a photo joins one with "collection": "<slug>"; a collection without text shows nothing
-const collections = import.meta.glob('../../collections/*/*.md', { eager: true });
-const story = (p) => {
-  if (!p.collection) return;
-  const c = collections[`../../collections/${lang}/${p.collection}.md`];
-  if (!c) throw new Error(`${p.file}: no src/collections/${lang}/${p.collection}.md`);
-  return c.rawContent().trim() && c;
-};
-
-const mailto = (p) =>
-  `mailto:${EMAIL}?subject=${encodeURIComponent(`${t.subject}: ${p.title}`)}&body=${encodeURIComponent(t.body(p))}`;
 // credit on every photo, for image search
-const gallery = {
-  '@type': 'ImageGallery',
-  image: photos.map((p) => ({
-    '@type': 'ImageObject',
-    contentUrl: new URL(`${import.meta.env.BASE_URL}photos/${p.file}-1280.jpg`, Astro.site).href,
-    name: p.title,
-    creator: { '@type': 'Person', name: 'Henk Bleeker' },
-    creditText: 'Henk Bleeker',
-    copyrightNotice: '© Henk Bleeker',
-  })),
-};
+const gallery = { '@type': 'ImageGallery', image: photos.map((p) => imageObject(p, lang, Astro.site)) };
 ---
 <Layout lang={lang} photo={hero} ld={[gallery]} overlay>
   <section class="hero">
@@ -53,20 +27,20 @@ const gallery = {
     </a>
   </section>
 
+  {/* each photo links to its own page; with JS it opens in the lightbox instead */}
   <main id="work">
     {photos.map((p) => (
-      <button class="thumb" data-open={`p-${p.file}`}>
+      <a class="thumb" href={workPath(p, lang)} data-open={`p-${p.file}`}>
         <Photo photo={p} sizes="(min-width: 900px) 33vw, (min-width: 600px) 50vw, 100vw" />
-      </button>
+      </a>
     ))}
   </main>
 
   {photos.map((p, i) => {
-    const c = story(p);
     const prev = photos.at(i - 1);
     const next = photos[(i + 1) % photos.length];
     return (
-      <dialog id={`p-${p.file}`}>
+      <dialog id={`p-${p.file}`} data-url={workPath(p, lang)}>
         <header>
           <a class="logo" href={lang === 'en' ? `${import.meta.env.BASE_URL}en/` : import.meta.env.BASE_URL}><Logo /></a>
           <form method="dialog"><nav>
@@ -81,37 +55,44 @@ const gallery = {
             </button>
           </nav></form>
         </header>
-        <figure>
-          <Photo photo={p} sizes={`min(92vw, ${Math.round((78 * p.width) / p.height)}vh)`} />
-          <figcaption>
-            <span>{p.title}</span>
-            {c && <a class="series" href={`#s-${p.file}`}>{c.frontmatter.title}</a>}
-            {p.text?.[lang] && <p class="text">{p.text[lang]}</p>}
-            <a class="enquire" href={mailto(p)}>Enquire</a>
-          </figcaption>
-        </figure>
-        {c && (
-          <section class="text" id={`s-${p.file}`}>
-            <h2>{c.frontmatter.title}</h2>
-            <c.Content />
-          </section>
-        )}
+        <PhotoView photo={p} {lang} />
       </dialog>
     );
   })}
 
   <script is:inline>
+    // the open photo's own address in the address bar: opening one adds a history entry, so Back closes it
+    const home = location.pathname;
     for (const b of document.querySelectorAll('[data-open]'))
-      b.addEventListener('click', () => {
-        document.querySelector('dialog[open]')?.close();
-        document.getElementById(b.dataset.open).showModal();
+      b.addEventListener('click', (e) => {
+        e.preventDefault();
+        const d = document.getElementById(b.dataset.open);
+        const was = document.querySelector('dialog[open]');
+        was?.close();
+        d.showModal();
+        history[was ? 'replaceState' : 'pushState']({ photo: d.id }, '', d.dataset.url);
       });
+    // Back and Forward between the gallery and a photo; the link to the story (#s-…) stays in the photo
+    addEventListener('popstate', () => {
+      const open = document.querySelector('dialog[open]');
+      const id = location.pathname === home ? null : (history.state?.photo ?? open?.id);
+      if (open?.id === id) return;
+      open?.close();
+      if (id) document.getElementById(id).showModal();
+    });
     // ← → do what the < > buttons do
     addEventListener('keydown', (e) =>
       e.key.startsWith('Arrow') && document.querySelector(`dialog[open] [aria-keyshortcuts=${e.key}]`)?.click());
-    // click on the white space around the photo closes it
-    for (const d of document.querySelectorAll('dialog'))
+    for (const d of document.querySelectorAll('dialog')) {
+      // click on the white space around the photo closes it
       d.addEventListener('click', (e) => e.target === d && d.close());
+      // closed (not swapped for the next one): back to the gallery's address
+      d.addEventListener('close', () => {
+        if (document.querySelector('dialog[open]')) return;
+        if (history.state?.photo) history.back();
+        else history.replaceState(null, '', home);
+      });
+    }
   </script>
 </Layout>
 
@@ -122,16 +103,7 @@ const gallery = {
   .down svg { display: block; width: 32px; height: 32px; stroke-width: 1.5; }
 
   main { columns: 3 260px; column-gap: 24px; padding: var(--pad); }
-  .thumb {
-    display: block;
-    width: 100%;
-    margin: 0 0 24px;
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: zoom-in;
-    break-inside: avoid;
-  }
+  .thumb { display: block; margin: 0 0 24px; cursor: zoom-in; break-inside: avoid; }
   .thumb img { transition: opacity 0.3s; }
   .thumb:hover img { opacity: 0.85; }
 
@@ -153,26 +125,4 @@ const gallery = {
   dialog header { position: sticky; top: 0; align-self: stretch; background: #fff; }
   dialog nav button { padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
   dialog nav button:hover { color: #222; }
-  figure { margin: auto 0; }
-  figure img { width: auto; max-width: 92vw; max-height: calc(100svh - 240px); }
-  figcaption {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    margin-top: 20px;
-    font-size: 13px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .enquire { padding: 10px 32px; border: 1px solid; font-size: 11px; letter-spacing: 0.2em; text-decoration: none; }
-  .enquire:hover { background: #222; color: #fff; }
-  .series { margin-top: -8px; font-size: 11px; color: var(--gray); text-decoration: none; }
-  .series:hover { color: #222; }
-
-  .text { max-width: 580px; margin: 0; padding: 0 var(--pad); font-size: 15px; letter-spacing: normal; text-transform: none; }
-  section.text { margin-top: 64px; }
-  .text h2, .text h3 { font-weight: 300; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; }
-  .text h2 { margin: 0 0 24px; text-align: center; }
-  .text h3 { margin: 32px 0 0; }
 </style>

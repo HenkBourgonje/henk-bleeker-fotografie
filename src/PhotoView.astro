@@ -1,0 +1,71 @@
+---
+import Photo from './Photo.astro';
+import { EMAIL } from './contact.js';
+
+// a photo with its title, story and Enquire button: in the home page's lightbox, and on its own page
+// page: on its own page, where the title is the h1 and the photo loads first
+const { photo: p, lang, page = false } = Astro.props;
+const t = {
+  nl: { subject: 'Interesse', body: (p) => `Hallo Henk,\n\nIk heb interesse in de foto "${p.title}" (ref. ${p.file}).\n\n` },
+  en: { subject: 'Enquiry', body: (p) => `Hello Henk,\n\nI'm interested in the photo "${p.title}" (ref. ${p.file}).\n\n` },
+}[lang];
+
+// src/collections/<lang>/<slug>.md, a photo joins one with "collection": "<slug>"; a collection without text shows nothing
+const collections = import.meta.glob('./collections/*/*.md', { eager: true });
+const story = () => {
+  if (!p.collection) return;
+  const c = collections[`./collections/${lang}/${p.collection}.md`];
+  if (!c) throw new Error(`${p.file}: no src/collections/${lang}/${p.collection}.md`);
+  return c.rawContent().trim() && c;
+};
+const c = story();
+
+const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(`${t.subject}: ${p.title}`)}&body=${encodeURIComponent(t.body(p))}`;
+const Title = page ? 'h1' : 'span';
+---
+<figure>
+  <Photo
+    photo={p}
+    sizes={`min(92vw, ${Math.round((78 * p.width) / p.height)}vh)`}
+    loading={page ? 'eager' : 'lazy'}
+    fetchpriority={page ? 'high' : undefined}
+  />
+  <figcaption>
+    <Title>{p.title}</Title>
+    {c && <a class="series" href={`#s-${p.file}`}>{c.frontmatter.title}</a>}
+    {p.text?.[lang] && <p class="text">{p.text[lang]}</p>}
+    <a class="enquire" href={mailto}>Enquire</a>
+  </figcaption>
+</figure>
+{c && (
+  <section class="text" id={`s-${p.file}`}>
+    <h2>{c.frontmatter.title}</h2>
+    <c.Content />
+  </section>
+)}
+
+<style is:global>
+  figure { margin: auto 0; }
+  figure img { width: auto; max-width: 92vw; max-height: calc(100svh - 240px); }
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-top: 20px;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  figcaption h1 { margin: 0; font: inherit; }
+  .enquire { padding: 10px 32px; border: 1px solid; font-size: 11px; letter-spacing: 0.2em; text-decoration: none; }
+  .enquire:hover { background: #222; color: #fff; }
+  .series { margin-top: -8px; font-size: 11px; color: var(--gray); text-decoration: none; }
+  .series:hover { color: #222; }
+
+  .text { max-width: 580px; margin: 0; padding: 0 var(--pad); font-size: 15px; letter-spacing: normal; text-transform: none; }
+  section.text { margin-top: 64px; }
+  .text h2, .text h3 { font-weight: 300; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .text h2 { margin: 0 0 24px; text-align: center; }
+  .text h3 { margin: 32px 0 0; }
+</style>
