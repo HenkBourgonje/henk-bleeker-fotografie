@@ -1,2 +1,2 @@
-export const EMAIL = 'hbleeker@xs4all.nl';
+export const EMAIL = 'info@henkbleeker.nl';
 export const INSTAGRAM = 'https://www.instagram.com/henkbleekerphotographyofficial';

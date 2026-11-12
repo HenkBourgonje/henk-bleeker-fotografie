@@ -6,8 +6,8 @@ import { EMAIL } from './contact.js';
 // page: on its own page, where the title is the h1 and the photo loads first
 const { photo: p, lang, page = false } = Astro.props;
 const t = {
-  nl: { subject: 'Interesse', body: (p) => `Hallo Henk,\n\nIk heb interesse in de foto "${p.title}" (ref. ${p.file}).\n\n` },
-  en: { subject: 'Enquiry', body: (p) => `Hello Henk,\n\nI'm interested in the photo "${p.title}" (ref. ${p.file}).\n\n` },
+  nl: { subject: 'Interesse', body: (p) => `Hallo Henk,\n\nIk heb interesse in de foto "${p.title}" (ref. ${p.file}).\n\n`, or: 'of mail naar', copy: 'kopieer', copied: 'gekopieerd' },
+  en: { subject: 'Enquiry', body: (p) => `Hello Henk,\n\nI'm interested in the photo "${p.title}" (ref. ${p.file}).\n\n`, or: 'or email', copy: 'copy', copied: 'copied' },
 }[lang];
 
 // src/collections/<lang>/<slug>.md, a photo joins one with "collection": "<slug>"; a collection without text shows nothing
@@ -35,6 +35,7 @@ const Title = page ? 'h1' : 'span';
     {c && <a class="series" href={`#s-${p.file}`}>{c.frontmatter.title}</a>}
     {p.text?.[lang] && <p class="text">{p.text[lang]}</p>}
     <a class="enquire" href={mailto}>Enquire</a>
+    <span class="mail">{t.or} <a href={mailto}>{EMAIL}</a> <button data-copy={EMAIL} data-done={t.copied}>{t.copy}</button></span>
   </figcaption>
 </figure>
 {c && (
@@ -60,6 +61,7 @@ const Title = page ? 'h1' : 'span';
   figcaption h1 { margin: 0; font: inherit; }
   .enquire { padding: 10px 32px; border: 1px solid; font-size: 11px; letter-spacing: 0.2em; text-decoration: none; }
   .enquire:hover { background: #222; color: #fff; }
+  .mail { margin-top: -6px; font-size: 12px; letter-spacing: 0.05em; text-transform: none; color: var(--gray); }
   .series { margin-top: -8px; font-size: 11px; color: var(--gray); text-decoration: none; }
   .series:hover { color: #222; }
 

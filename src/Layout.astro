@@ -18,12 +18,12 @@ const t = {
   nl: {
     job: 'kunst- en documentairefotograaf',
     description: 'Kunst- en documentairefotograaf Henk Bleeker uit Friesland: cowboys in de VS, boksers in Havana, de Mennonieten in Paraguay. Prints in de Wetlands Gallery.',
-    work: 'Werk', about: 'Over Henk', email: 'E-mail', other: 'English',
+    work: 'Werk', about: 'Over Henk', email: 'E-mail', other: 'English', copy: 'kopieer', copied: 'gekopieerd',
   },
   en: {
     job: 'art and documentary photographer',
     description: 'Art and documentary photographer Henk Bleeker from Friesland: cowboys in the USA, boxers in Havana, the Mennonites of Paraguay. Prints at the Wetlands Gallery.',
-    work: 'Work', about: 'About', email: 'Email', other: 'Nederlands',
+    work: 'Work', about: 'About', email: 'Email', other: 'Nederlands', copy: 'copy', copied: 'copied',
   },
 }[lang];
 const pageTitle = title ?? `Henk Bleeker Photography · ${t.job}`;
@@ -99,7 +99,21 @@ const Brand = overlay ? 'h1' : 'div';
       </nav>
     </header>
     <slot />
-    <footer>© {new Date().getFullYear()} Henk Bleeker Photography</footer>
+    <footer>
+      © {new Date().getFullYear()} Henk Bleeker Photography · <a href={`mailto:${EMAIL}`}>{EMAIL}</a> <button data-copy={EMAIL} data-done={t.copied}>{t.copy}</button>
+    </footer>
+    <script is:inline>
+      // for visitors whose computer has no mail program, so the mailto link opens nothing
+      addEventListener('click', (e) => {
+        const b = e.target.closest('[data-copy]');
+        if (!b) return;
+        b.dataset.label ??= b.textContent;
+        navigator.clipboard.writeText(b.dataset.copy).then(() => {
+          b.textContent = b.dataset.done;
+          setTimeout(() => (b.textContent = b.dataset.label), 2000);
+        });
+      });
+    </script>
   </body>
 </html>
 
@@ -146,4 +160,6 @@ const Brand = overlay ? 'h1' : 'div';
   .lang { margin-left: 4px; font-size: 12px; line-height: 20px; letter-spacing: 0.12em; text-decoration: none; }
 
   footer { padding: 32px var(--pad) 48px; text-align: center; font-size: 12px; letter-spacing: 0.1em; color: var(--gray); }
+  [data-copy] { padding: 0; border: 0; background: none; font: inherit; letter-spacing: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+  [data-copy]:hover { color: #222; }
 </style>
