@@ -3,17 +3,54 @@ import Logo from './logo.svg';
 import { EMAIL, INSTAGRAM } from './contact.js';
 
 // lang: 'nl' at the site root, 'en' under en/
+// description: the snippet under the search result; photo: the image in link previews
+// ld: this page's own schema.org nodes, next to the ones every page has
 // overlay: header on top of the home page hero, where the logo is the page's h1
-const { lang, title = 'Henk Bleeker Photography', image, overlay = false } = Astro.props;
+const { lang, title, description, photo, ld = [], overlay = false } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const home = lang === 'en' ? `${base}en/` : base;
 const other = lang === 'en' ? 'nl' : 'en';
-// this page in the other language
-const otherUrl = (other === 'en' ? `${base}en/` : base) + Astro.url.pathname.slice(home.length);
+// this page in each language
+const rest = Astro.url.pathname.slice(home.length);
+const path = { nl: base + rest, en: `${base}en/${rest}` };
+const abs = (p) => new URL(p, Astro.site).href;
 const t = {
-  nl: { description: 'Kunstfotografie van Henk Bleeker.', work: 'Werk', about: 'Over Henk', email: 'E-mail', other: 'English' },
-  en: { description: 'Fine art photography by Henk Bleeker.', work: 'Work', about: 'About', email: 'Email', other: 'Nederlands' },
+  nl: {
+    job: 'kunst- en documentairefotograaf',
+    description: 'Kunst- en documentairefotograaf Henk Bleeker uit Friesland: cowboys in de VS, boksers in Havana, de Mennonieten in Paraguay. Prints in de Wetlands Gallery.',
+    work: 'Werk', about: 'Over Henk', email: 'E-mail', other: 'English',
+  },
+  en: {
+    job: 'art and documentary photographer',
+    description: 'Art and documentary photographer Henk Bleeker from Friesland: cowboys in the USA, boxers in Havana, the Mennonites of Paraguay. Prints at the Wetlands Gallery.',
+    work: 'Work', about: 'About', email: 'Email', other: 'Nederlands',
+  },
 }[lang];
+const pageTitle = title ?? `Henk Bleeker Photography · ${t.job}`;
+
+// who Henk is, for search engines and language models; facts from the about page
+const henk = { '@type': 'Person', '@id': abs(`${base}#henk`), name: 'Henk Bleeker' };
+const place = { '@type': 'PostalAddress', addressLocality: 'Alde Leie', addressRegion: 'Friesland', addressCountry: 'NL' };
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      ...henk,
+      jobTitle: t.job,
+      birthDate: '1969',
+      birthPlace: { '@type': 'Place', name: 'Hallum' },
+      alumniOf: { '@type': 'CollegeOrUniversity', name: 'Koninklijke Academie van Beeldende Kunsten' },
+      address: place,
+      email: EMAIL,
+      image: abs(`${base}photos/henk-studio-1280.jpg`),
+      url: abs(home),
+      sameAs: [INSTAGRAM],
+    },
+    { '@type': 'WebSite', '@id': abs(`${base}#site`), url: abs(base), name: 'Henk Bleeker Photography', author: henk },
+    { '@type': 'ArtGallery', name: 'Wetlands Gallery', url: abs(`${home}wetlands-gallery/`), address: place, founder: henk },
+    ...ld,
+  ],
+};
 const Brand = overlay ? 'h1' : 'div';
 ---
 <!doctype html>
@@ -21,11 +58,23 @@ const Brand = overlay ? 'h1' : 'div';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={t.description} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description ?? t.description} />
+    <link rel="canonical" href={abs(path[lang])} />
+    <link rel="alternate" hreflang="nl" href={abs(path.nl)} />
+    <link rel="alternate" hreflang="en" href={abs(path.en)} />
+    <link rel="alternate" hreflang="x-default" href={abs(path.nl)} />
     <link rel="icon" href={`${base}favicon.svg`} />
-    <meta property="og:title" content={title} />
-    {image && <meta property="og:image" content={image} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Henk Bleeker Photography" />
+    <meta property="og:locale" content={lang === 'en' ? 'en_GB' : 'nl_NL'} />
+    <meta property="og:url" content={abs(path[lang])} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description ?? t.description} />
+    {photo && <meta property="og:image" content={abs(`${base}photos/${photo.file}-1280.jpg`)} />}
+    {photo && <meta property="og:image:alt" content={photo.title} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
   </head>
   <body>
     <header class:list={{ overlay }}>
@@ -46,7 +95,7 @@ const Brand = overlay ? 'h1' : 'div';
         <a href={`mailto:${EMAIL}`} aria-label={t.email}>
           <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" /><path d="m3 5 9 8 9-8" /></svg>
         </a>
-        <a class="lang" href={otherUrl} hreflang={other} lang={other} aria-label={t.other}>{other.toUpperCase()}</a>
+        <a class="lang" href={path[other]} hreflang={other} lang={other} aria-label={t.other}>{other.toUpperCase()}</a>
       </nav>
     </header>
     <slot />

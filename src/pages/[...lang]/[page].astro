@@ -2,7 +2,7 @@
 import Layout from '../../Layout.astro';
 import Photo from '../../Photo.astro';
 
-// one page per src/text/<page>/<lang>.md, with title and photo in the frontmatter
+// one page per src/text/<page>/<lang>.md, with title, photo and description (the search snippet) in the frontmatter
 export const getStaticPaths = () =>
   Object.entries(import.meta.glob('../../text/*/*.md', { eager: true })).map(([path, text]) => {
     const [, page, lang] = path.match(/([^/]+)\/(nl|en)\.md$/);
@@ -10,9 +10,9 @@ export const getStaticPaths = () =>
   });
 const { text } = Astro.props;
 const lang = Astro.params.lang ?? 'nl';
-const { title, photo } = text.frontmatter;
+const { title, photo, description } = text.frontmatter;
 ---
-<Layout lang={lang} title={`${title} · Henk Bleeker Photography`}>
+<Layout lang={lang} title={`${title} · Henk Bleeker Photography`} {description} {photo}>
   <main class="page">
     <aside>
       <Photo photo={photo} sizes="(min-width: 640px) 300px, 100vw" />

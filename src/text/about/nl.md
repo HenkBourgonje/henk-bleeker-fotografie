@@ -1,6 +1,7 @@
 ---
 title: Over Henk
 photo: { file: henk-studio, title: Henk Bleeker in zijn studio, width: 1500, height: 1500 }
+description: "Henk Bleeker (Hallum, 1969) is een vooraanstaande Nederlandse kunst- en documentairefotograaf uit Friesland, die in 1994 afstudeerde aan de Koninklijke Academie van Beeldende Kunsten in Den Haag."
 ---
 
 Fotografie gaat over observeren, maar hier gaat het om luisteren. Het gaat niet om het zachte gefluister van een cowboy in de VS of het horen van het ritmische dansen van een bokser in een sportschool in Havana.

@@ -1,6 +1,7 @@
 ---
 title: About Henk
 photo: { file: henk-studio, title: Henk Bleeker in his studio, width: 1500, height: 1500 }
+description: "Henk Bleeker (Hallum, 1969) is a prominent Dutch art and documentary photographer from Friesland who graduated from the Royal Academy of Art in The Hague in 1994."
 ---
 
 Photography is about observing, but here it's about listening. It's not about the quiet whisper of a cowboy in the USA or hearing the rhythmic dancing of a boxer in a gym in Havana.

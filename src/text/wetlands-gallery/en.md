@@ -1,6 +1,7 @@
 ---
 title: Wetlands Gallery
 photo: { file: wetlands-gallery, title: Wetlands Gallery, width: 2048, height: 1536 }
+description: "Located in the northern part of Friesland Alde Leije not far from the Wadden Sea, the Wetlands Gallery is a place where you can visit and view large-format fine-art prints and truly experience the atmosphere of an image—brought to life on specially selected paper."
 ---
 
 ![Wetlands Gallery](./logo.png)

@@ -32,9 +32,20 @@ const story = (p) => {
 
 const mailto = (p) =>
   `mailto:${EMAIL}?subject=${encodeURIComponent(`${t.subject}: ${p.title}`)}&body=${encodeURIComponent(t.body(p))}`;
-const ogImage = new URL(`${import.meta.env.BASE_URL}photos/${hero.file}-1280.jpg`, Astro.site);
+// credit on every photo, for image search
+const gallery = {
+  '@type': 'ImageGallery',
+  image: photos.map((p) => ({
+    '@type': 'ImageObject',
+    contentUrl: new URL(`${import.meta.env.BASE_URL}photos/${p.file}-1280.jpg`, Astro.site).href,
+    name: p.title,
+    creator: { '@type': 'Person', name: 'Henk Bleeker' },
+    creditText: 'Henk Bleeker',
+    copyrightNotice: '© Henk Bleeker',
+  })),
+};
 ---
-<Layout lang={lang} image={ogImage} overlay>
+<Layout lang={lang} photo={hero} ld={[gallery]} overlay>
   <section class="hero">
     <Photo photo={hero} sizes={`max(100vw, ${Math.round((100 * hero.width) / hero.height)}vh)`} loading="eager" fetchpriority="high" />
     <a class="down" href="#work" aria-label={t.down}>
