@@ -36,6 +36,8 @@ const { title, photo, description } = text.frontmatter;
   .page h1 { margin: 0 0 20px; font-size: 15px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; }
   .page h2 { margin: 2.4em 0 1.4em; font-size: 13px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; }
   .page p { margin: 0 0 1.4em; font-size: 14px; line-height: 1.75; }
+  /* Google Maps embed in black and white, like the rest of the site */
+  .page .map { display: block; width: 100%; aspect-ratio: 4 / 3; border: 0; filter: grayscale(1); }
 
   @media (max-width: 640px) {
     .page { grid-template-columns: 1fr; }

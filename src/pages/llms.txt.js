@@ -6,8 +6,8 @@ import { workPath } from '../work.js';
 const texts = import.meta.glob('../text/*/en.md', { eager: true });
 const collections = import.meta.glob('../collections/en/*.md', { eager: true });
 const collection = (slug) => collections[`../collections/en/${slug}.md`].frontmatter.title;
-// the text without its images, its headings one level down to sit under this file's
-const body = (md) => md.rawContent().replace(/!\[.*?\]\(.*?\)\s*/g, '').replace(/^(#+ )/gm, '#$1').trim();
+// the text without its images and HTML (the map), its headings one level down to sit under this file's
+const body = (md) => md.rawContent().replace(/!\[.*?\]\(.*?\)\s*|<[^>]+>\s*/g, '').replace(/^(#+ )/gm, '#$1').trim();
 
 export const GET = ({ site }) => {
   const url = (path) => new URL(import.meta.env.BASE_URL + path, site).href;

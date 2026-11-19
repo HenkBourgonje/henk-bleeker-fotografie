@@ -47,7 +47,14 @@ const schema = {
       sameAs: [INSTAGRAM],
     },
     { '@type': 'WebSite', '@id': abs(`${base}#site`), url: abs(base), name: 'Henk Bleeker Photography', author: henk },
-    { '@type': 'ArtGallery', name: 'Wetlands Gallery', url: abs(`${home}wetlands-gallery/`), address: place, founder: henk },
+    {
+      '@type': 'ArtGallery',
+      name: 'Wetlands Gallery',
+      url: abs(`${home}wetlands-gallery/`),
+      address: { ...place, streetAddress: 'Leijester Hegedyk 27 b, Unit 10', postalCode: '9071 XB' },
+      telephone: '+31651060719',
+      founder: henk,
+    },
     ...ld,
   ],
 };
