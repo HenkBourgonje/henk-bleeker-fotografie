@@ -1,7 +1,7 @@
 ---
 // public/photos holds <file>-<width>.{avif,jpg} from resize-heroes.sh, which skips widths >= the original
 const { photo, sizes, loading = 'lazy', ...rest } = Astro.props;
-const widths = [640, 1280, 1920, 2560, 3840].filter((w) => w < photo.width);
+const widths = [640, 1280, 1920].filter((w) => w < photo.width);
 const url = (w, ext) => `${import.meta.env.BASE_URL}photos/${photo.file}-${w}.${ext}`;
 const srcset = (ext) => widths.map((w) => `${url(w, ext)} ${w}w`).join(', ');
 ---

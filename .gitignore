@@ -8,3 +8,5 @@ DW website/
 henkbleeker-photos/
 *.tif
 *.tiff
+# Local copy of the site photos up to 3840px, from before the site was capped at 1920px
+photos-hoge-kwaliteit/

@@ -110,6 +110,8 @@ const Brand = overlay ? 'h1' : 'div';
       © {new Date().getFullYear()} Henk Bleeker Photography · <a href={`mailto:${EMAIL}`}>{EMAIL}</a> <button data-copy={EMAIL} data-done={t.copied}>{t.copy}</button>
     </footer>
     <script is:inline>
+      // no "Save image" on right-click: only a hurdle, a screenshot still works
+      addEventListener('contextmenu', (e) => e.target.closest('img') && e.preventDefault());
       // for visitors whose computer has no mail program, so the mailto link opens nothing
       addEventListener('click', (e) => {
         const b = e.target.closest('[data-copy]');
@@ -133,7 +135,7 @@ const Brand = overlay ? 'h1' : 'div';
     background: #fff;
   }
   body { margin: 0; }
-  img { display: block; width: 100%; height: auto; }
+  img { display: block; width: 100%; height: auto; -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; }
   a { color: inherit; }
   svg { fill: none; stroke: currentColor; stroke-width: 1.2; }
 

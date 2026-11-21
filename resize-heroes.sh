@@ -4,7 +4,7 @@
 set -euo pipefail
 src=${1:-"DW website"}
 out=${2:-public/photos}
-widths=(640 1280 1920 2560 3840)
+widths=(640 1280 1920)  # capped so the site photos are too small for a good print
 mkdir -p "$out"
 
 for f in "$src"/*.(jpg|jpeg|tif|tiff)(N); do
@@ -22,5 +22,6 @@ for f in "$src"/*.(jpg|jpeg|tif|tiff)(N); do
       vips thumbnail "$f" "$out/$name-$w.$ext" $w --height 100000 --export-profile srgb
     done
   done
+  exiftool -q -overwrite_original -Artist='Henk Bleeker' -Copyright='© Henk Bleeker Photography, henkbleeker.nl' "$out/$name"-*.(jpg|avif)
   echo "done: $name"
 done
