@@ -1,12 +1,20 @@
 ---
 title: Wetlands Gallery
 photo: { file: wetlands-gallery, title: Wetlands Gallery, width: 2048, height: 1536 }
-description: "Located in the northern part of Friesland Alde Leije not far from the Wadden Sea, the Wetlands Gallery is a place where you can visit and view large-format fine-art prints and truly experience the atmosphere of an image—brought to life on specially selected paper."
+description: "Henk Bleeker's studio and Wetlands Gallery are in Alde Leie, Friesland. You are very welcome by appointment or during our open gallery days."
 ---
 
 ![Wetlands Gallery](./logo.png)
 
-Located in the northern part of Friesland Alde Leije not far from the Wadden Sea, the Wetlands Gallery is a place where you can visit and view large-format fine-art prints and truly experience the atmosphere of an image—brought to life on specially selected paper. Whether framed or unframed, everything is possible in any conceivable size. Welcome to my world....Best Henk
+Henk Bleeker's studio and Wetlands Gallery are in Alde Leie, Friesland. You are very welcome by appointment or during our open gallery days.
+
+In the gallery you get a personal look at Henk's artistic process: from large fine-art prints on special papers and unique editions to work that is still in progress.
+
+Whether you are a collector considering a new acquisition, looking for inspiration or just curious to see the work up close — we'd love to welcome you.
+
+## Ask for price and availability
+
+Have your eye on a piece, or want to explore the options online? [Ask for the details here.](mailto:info@henkbleeker.nl) We'll gladly let you know the price and availability. That can be by email, but of course also in person during a visit to the Wetlands Gallery.
 
 ## Address
 
