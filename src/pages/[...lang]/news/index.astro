@@ -1,0 +1,34 @@
+---
+import Layout from '../../../Layout.astro';
+import Photo from '../../../Photo.astro';
+import { news, newsPath } from '../../../news.js';
+
+// the news as cards, in the home page's masonry
+export const getStaticPaths = () => [{ params: { lang: undefined } }, { params: { lang: 'en' } }];
+const lang = Astro.params.lang ?? 'nl';
+const t = {
+  nl: { title: 'Nieuws', description: 'Nieuws van fotograaf Henk Bleeker: exposities, publicaties en ander werk.' },
+  en: { title: 'News', description: 'News from photographer Henk Bleeker: exhibitions, publications and other work.' },
+}[lang];
+const articles = news(lang);
+---
+<Layout lang={lang} title={`${t.title} · Henk Bleeker Photography`} description={t.description} photo={articles[0]?.md.frontmatter.photo}>
+  <h1 class="news-title">{t.title}</h1>
+  <main class="news">
+    {articles.map(({ slug, md }) => (
+      <a class="card" href={newsPath(slug, lang)}>
+        <Photo photo={md.frontmatter.photo} sizes="(min-width: 900px) 33vw, (min-width: 600px) 50vw, 100vw" />
+        <h2>{md.frontmatter.title}</h2>
+      </a>
+    ))}
+  </main>
+</Layout>
+
+<style>
+  .news-title { margin: 16px 0 8px; text-align: center; font-size: 15px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; }
+  .news { columns: 3 260px; column-gap: 24px; padding: var(--pad); }
+  .card { display: block; margin: 0 0 32px; text-decoration: none; break-inside: avoid; }
+  .card img { transition: opacity 0.3s; }
+  .card:hover img { opacity: 0.85; }
+  .card h2 { margin: 12px 0 0; font-size: 13px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; }
+</style>

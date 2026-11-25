@@ -1,0 +1,30 @@
+---
+import Layout from '../../../Layout.astro';
+import Viewer from '../../../Viewer.astro';
+import { news } from '../../../news.js';
+
+export const getStaticPaths = () =>
+  ['nl', 'en'].flatMap((lang) => news(lang).map(({ slug, md }) => ({ params: { lang: lang === 'nl' ? undefined : lang, article: slug }, props: { md } })));
+const { md } = Astro.props;
+const lang = Astro.params.lang ?? 'nl';
+const { title, photo, description } = md.frontmatter;
+const date = new Date(md.frontmatter.date);
+---
+<Layout lang={lang} title={`${title} · Henk Bleeker Photography`} {description} {photo}>
+  <main class="article">
+    <Viewer {photo} {lang} eager />
+    <article>
+      <time datetime={date.toISOString().slice(0, 10)}>{date.toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' })}</time>
+      <h1>{title}</h1>
+      <md.Content />
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .article { display: flex; flex-direction: column; align-items: center; padding: 0 var(--pad) 48px; }
+  article { max-width: 580px; margin-top: 32px; }
+  time { font-size: 12px; letter-spacing: 0.1em; color: var(--gray); }
+  h1 { margin: 4px 0 20px; font-size: 15px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; }
+  article :global(p) { margin: 0 0 1.4em; font-size: 14px; line-height: 1.75; }
+</style>

@@ -1,13 +1,13 @@
 ---
-import Photo from './Photo.astro';
+import Viewer from './Viewer.astro';
 import { EMAIL } from './contact.js';
 
 // a photo with its title, story and Enquire button: in the home page's lightbox, and on its own page
 // page: on its own page, where the title is the h1 and the photo loads first
 const { photo: p, lang, page = false } = Astro.props;
 const t = {
-  nl: { subject: 'Interesse', body: (p) => `Hallo Henk,\n\nIk heb interesse in de foto "${p.title}" (ref. ${p.file}).\n\n`, or: 'of mail naar', copy: 'kopieer', copied: 'gekopieerd', prev: 'Vorige pagina', next: 'Volgende pagina' },
-  en: { subject: 'Enquiry', body: (p) => `Hello Henk,\n\nI'm interested in the photo "${p.title}" (ref. ${p.file}).\n\n`, or: 'or email', copy: 'copy', copied: 'copied', prev: 'Previous page', next: 'Next page' },
+  nl: { subject: 'Interesse', body: (p) => `Hallo Henk,\n\nIk heb interesse in de foto "${p.title}" (ref. ${p.file}).\n\n`, or: 'of mail naar', copy: 'kopieer', copied: 'gekopieerd' },
+  en: { subject: 'Enquiry', body: (p) => `Hello Henk,\n\nI'm interested in the photo "${p.title}" (ref. ${p.file}).\n\n`, or: 'or email', copy: 'copy', copied: 'copied' },
 }[lang];
 
 // src/collections/<lang>/<slug>.md, a photo joins one with "collection": "<slug>"; a collection without text shows nothing
@@ -22,23 +22,9 @@ const c = story();
 
 const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(`${t.subject}: ${p.title}`)}&body=${encodeURIComponent(t.body(p))}`;
 const Title = page ? 'h1' : 'span';
-const sizes = (q) => `min(92vw, ${Math.round((78 * q.width) / q.height)}vh)`;
-
-// a magazine ("pages": [[width, height], …]): page 1 is <file>, the cover in the gallery, page n is <file>-n
-const pages = p.pages?.map(([width, height], i) => ({ file: i ? `${p.file}-${i + 1}` : p.file, title: `${p.title} (${i + 1})`, width, height }));
 ---
 <figure>
-  {pages ? (
-    <div class="magazine">
-      <div class="pages">
-        {pages.map((q, i) => <Photo photo={q} sizes={sizes(q)} loading={page && !i ? 'eager' : 'lazy'} />)}
-      </div>
-      <button type="button" data-flip="-1" aria-label={t.prev} aria-keyshortcuts="ArrowLeft"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7" /></svg></button>
-      <button type="button" data-flip="1" aria-label={t.next} aria-keyshortcuts="ArrowRight"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg></button>
-    </div>
-  ) : (
-    <Photo photo={p} sizes={sizes(p)} loading={page ? 'eager' : 'lazy'} fetchpriority={page ? 'high' : undefined} />
-  )}
+  <Viewer photo={p} {lang} eager={page} />
   <figcaption>
     <Title>{p.title}</Title>
     {c && <a class="series" href={`#s-${p.file}`}>{c.frontmatter.title}</a>}
@@ -54,27 +40,8 @@ const pages = p.pages?.map(([width, height], i) => ({ file: i ? `${p.file}-${i +
   </section>
 )}
 
-<script>
-  // a magazine turns a page with < >, or with a click on the page; swiping just scrolls
-  addEventListener('click', (e) => {
-    const b = e.target.closest('[data-flip], .pages img');
-    const s = b?.closest('.magazine').querySelector('.pages');
-    s?.scrollBy({ left: (b.dataset.flip ?? 1) * s.clientWidth, behavior: 'smooth' });
-  });
-</script>
-
 <style is:global>
   figure { margin: auto 0; }
-  figure img { width: auto; max-width: 92vw; max-height: calc(100svh - 240px); }
-  .magazine { position: relative; }
-  .pages { display: flex; align-items: center; width: 92vw; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-  .pages picture { flex: 0 0 100%; display: flex; justify-content: center; align-items: center; scroll-snap-align: center; }
-  .pages img { cursor: pointer; }
-  .magazine > button { position: absolute; top: 50%; translate: 0 -50%; padding: 8px 0; border: 0; background: rgb(255 255 255 / 0.7); color: inherit; cursor: pointer; }
-  .magazine > button:first-of-type { left: 0; }
-  .magazine > button:last-child { right: 0; }
-  .magazine > button:hover { color: #222; }
-  .magazine svg { display: block; width: 32px; height: 32px; stroke-width: 1.5; }
   figcaption {
     display: flex;
     flex-direction: column;

@@ -1,6 +1,7 @@
 import photos from '../photos.json';
 import { EMAIL, INSTAGRAM } from '../contact.js';
 import { workPath } from '../work.js';
+import { news, newsPath } from '../news.js';
 
 // llmstxt.org: the whole site as one Markdown file for language models, in English, from the same texts as the pages
 const texts = import.meta.glob('../text/*/en.md', { eager: true });
@@ -26,6 +27,10 @@ ${pages.map((p) => `- [${p.md.frontmatter.title}](${p.url}): ${p.md.frontmatter.
 - [Work](${url('en/')}): ${photos.length} photographs
 
 ${pages.map((p) => `## ${p.md.frontmatter.title}\n\n${body(p.md)}`).join('\n\n')}
+
+## News
+
+${news('en').map((a) => `### [${a.md.frontmatter.title}](${new URL(newsPath(a.slug, 'en'), site).href})\n\n${body(a.md)}`).join('\n\n')}
 
 ## Collections
 

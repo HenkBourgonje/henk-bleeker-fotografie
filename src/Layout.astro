@@ -18,12 +18,12 @@ const t = {
   nl: {
     job: 'kunst- en documentairefotograaf',
     description: 'Kunst- en documentairefotograaf Henk Bleeker uit Friesland: cowboys in de VS, boksers in Havana, de Mennonieten in Paraguay. Prints in de Wetlands Gallery.',
-    work: 'Werk', about: 'Over Henk', email: 'E-mail', other: 'English', copy: 'kopieer', copied: 'gekopieerd',
+    work: 'Werk', news: 'Nieuws', about: 'Over Henk', email: 'E-mail', other: 'English', copy: 'kopieer', copied: 'gekopieerd',
   },
   en: {
     job: 'art and documentary photographer',
     description: 'Art and documentary photographer Henk Bleeker from Friesland: cowboys in the USA, boxers in Havana, the Mennonites of Paraguay. Prints at the Wetlands Gallery.',
-    work: 'Work', about: 'About', email: 'Email', other: 'Nederlands', copy: 'copy', copied: 'copied',
+    work: 'Work', news: 'News', about: 'About', email: 'Email', other: 'Nederlands', copy: 'copy', copied: 'copied',
   },
 }[lang];
 const pageTitle = title ?? `Henk Bleeker Photography · ${t.job}`;
@@ -89,6 +89,9 @@ const Brand = overlay ? 'h1' : 'div';
       <nav>
         <a href={`${home}#work`} aria-label={t.work}>
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" /><path d="M9 3v18M15 3v18M3 9h18M3 15h18" /></svg>
+        </a>
+        <a href={`${home}news/`} aria-label={t.news}>
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" /><path d="M7 8h10M7 12h4M7 16h4M14 12h3v4h-3z" /></svg>
         </a>
         <a href={`${home}about/`} aria-label={t.about}>
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" /><path d="M7 8h10M7 12h10M7 16h6" /></svg>

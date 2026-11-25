@@ -1,7 +1,8 @@
 import photos from '../photos.json';
 import { workPath } from '../work.js';
+import { news, newsPath } from '../news.js';
 
-// every page in both languages: home, the text pages and each photo's own page, with the images each shows
+// every page in both languages: home, the text pages, the news and each photo's own page, with the images each shows
 const pages = Object.keys(import.meta.glob('../text/*/nl.md')).map((f) => f.split('/')[2]);
 
 export const GET = ({ site }) => {
@@ -10,8 +11,9 @@ export const GET = ({ site }) => {
   const entries = [
     ...['', 'en/'].flatMap((home) => [
       `<url><loc>${url(home)}</loc>${photos.map(image).join('')}</url>`,
-      ...pages.map((page) => `<url><loc>${url(`${home}${page}/`)}</loc></url>`),
+      ...[...pages, 'news'].map((page) => `<url><loc>${url(`${home}${page}/`)}</loc></url>`),
     ]),
+    ...['nl', 'en'].flatMap((lang) => news(lang).map((a) => `<url><loc>${new URL(newsPath(a.slug, lang), site).href}</loc></url>`)),
     ...['nl', 'en'].flatMap((lang) => photos.map((p) => `<url><loc>${new URL(workPath(p, lang), site).href}</loc>${image(p)}</url>`)),
   ];
   return new Response(
