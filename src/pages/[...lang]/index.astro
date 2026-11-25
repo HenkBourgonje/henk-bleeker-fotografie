@@ -80,9 +80,9 @@ const gallery = { '@type': 'ImageGallery', image: photos.map((p) => imageObject(
       open?.close();
       if (id) document.getElementById(id).showModal();
     });
-    // ← → do what the < > buttons do
+    // ← → do what the < > buttons do; in a magazine they turn its pages (its buttons come last)
     addEventListener('keydown', (e) =>
-      e.key.startsWith('Arrow') && document.querySelector(`dialog[open] [aria-keyshortcuts=${e.key}]`)?.click());
+      e.key.startsWith('Arrow') && [...document.querySelectorAll(`dialog[open] [aria-keyshortcuts=${e.key}]`)].pop()?.click());
     for (const d of document.querySelectorAll('dialog')) {
       // click on the white space around the photo closes it
       d.addEventListener('click', (e) => e.target === d && d.close());
